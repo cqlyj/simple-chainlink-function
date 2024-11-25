@@ -8,8 +8,7 @@ import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/v1_0_0/l
 contract SimpleBalance is FunctionsClient, ConfirmedOwner {
     using FunctionsRequest for FunctionsRequest.Request;
 
-    uint256 private balance;
-    address constant USER = 0xFB6a372F2F51a002b390D18693075157A459641F;
+    bytes private balance;
 
     /*//////////////////////////////////////////////////////////////
                           CHAINLINK VARIABLES
@@ -43,13 +42,18 @@ contract SimpleBalance is FunctionsClient, ConfirmedOwner {
         0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000;
 
     // State variable to store the returned character information
-    // string public character; // here the character is the balance
+    string public character; // here the character is the balance
 
     // Custom error type
     error UnexpectedRequestID(bytes32 requestId);
 
     // Event to log responses
-    event Response(bytes32 indexed requestId, bytes response, bytes err);
+    event Response(
+        bytes32 indexed requestId,
+        string character,
+        bytes response,
+        bytes err
+    );
 
     /**
      * @notice Initializes the contract with the Chainlink router address and sets the contract owner
@@ -101,18 +105,20 @@ contract SimpleBalance is FunctionsClient, ConfirmedOwner {
         }
         // Update the contract's state variables with the response and any errors
         s_lastResponse = response;
-        balance = uint256(bytes32((response)));
+        character = string(response);
         s_lastError = err;
 
+        balance = response;
+
         // Emit an event to log the response
-        emit Response(requestId, s_lastResponse, s_lastError);
+        emit Response(requestId, character, s_lastResponse, s_lastError);
     }
 
     /*//////////////////////////////////////////////////////////////
                                 GETTERS
     //////////////////////////////////////////////////////////////*/
 
-    function getBalance() public view returns (uint256) {
+    function getBalance() public view returns (bytes memory) {
         return balance;
     }
 }
