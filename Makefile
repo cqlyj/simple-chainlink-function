@@ -1,5 +1,9 @@
 -include .env
 
+all : install build
+
+build :; @forge build
+
 install:
 	@forge install smartcontractkit/chainlink-brownie-contracts --no-commit && forge install cyfrin/foundry-devops --no-commit
 
